@@ -272,7 +272,26 @@ function lazyLoadModels() {
         wrappers.forEach(w => {
             const badge = w.querySelector('.instruction-badge');
             if (badge) badge.textContent = '👆 Toca para ver en 3D';
+
+            let touchStartY, touchStartX;
+
+            w.addEventListener('touchstart', function(e) {
+                touchStartY = e.touches[0].clientY;
+                touchStartX = e.touches[0].clientX;
+            }, { passive: true });
+
+            w.addEventListener('touchend', function(e) {
+                if (touchStartY === undefined) return;
+                const dy = e.changedTouches[0].clientY - touchStartY;
+                const dx = e.changedTouches[0].clientX - touchStartX;
+                const dist = Math.sqrt(dy * dy + dx * dx);
+                touchStartY = touchStartX = undefined;
+                if (dist > 10) return;
+                if (w.dataset.cargando === 'true') return;
+                cargarModelo(w);
+            }, { passive: true });
         });
+        return;
     }
 
     if ('IntersectionObserver' in window) {
