@@ -49,5 +49,5 @@ function generarId(productos) {
 
 // Configura aquí tu número de WhatsApp (código de país + número, sin signos)
 // Ejemplo: '51987654321' para Perú
-const WHATSAPP_NUMBER = '51924784975';
+const WHATSAPP_NUMBER = '51978836377';
 const WHATSAPP_LINK = 'https://w.app/t3rdbk';
