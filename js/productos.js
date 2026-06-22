@@ -22,17 +22,24 @@ const PRODUCTOS_DEFAULT = [
     { id: 18, nombre: 'Llavero Cara', subtitulo: 'Colección Pava Aliblanca', precio: 'S/ 6.00', modelo: 'llavero_de_cara_de_pava_aliblanca.glb', coleccion: 'Prototipo de Productos - Fauna Regional' }
 ];
 
+var PRODUCTOS_VERSION = 2;
+
 function obtenerProductos() {
     const guardados = localStorage.getItem('artesanias_productos');
     if (guardados) {
-        try { return JSON.parse(guardados); }
-        catch (e) { return [...PRODUCTOS_DEFAULT]; }
+        try {
+            const parsed = JSON.parse(guardados);
+            if (parsed.version === PRODUCTOS_VERSION) return parsed.productos;
+        } catch (e) {}
     }
     return [...PRODUCTOS_DEFAULT];
 }
 
 function guardarProductos(productos) {
-    localStorage.setItem('artesanias_productos', JSON.stringify(productos));
+    localStorage.setItem('artesanias_productos', JSON.stringify({
+        version: PRODUCTOS_VERSION,
+        productos: productos
+    }));
 }
 
 function generarId(productos) {
