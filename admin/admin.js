@@ -81,7 +81,7 @@ function mostrarMensaje(texto, tipo) {
 function renderizarTabla() {
     const productos = obtenerProductos();
     if (productos.length === 0) {
-        tablaBody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--accent-color);">No hay productos registrados.</td></tr>';
+        tablaBody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--accent-color);">No hay productos registrados.</td></tr>';
         return;
     }
     tablaBody.innerHTML = '';
@@ -93,6 +93,7 @@ function renderizarTabla() {
             <td>${p.coleccion}</td>
             <td>${p.precio}</td>
             <td style="font-size:0.85rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${p.modelo}">${p.modelo}</td>
+            <td id="thumb-cell-${p.id}" style="text-align:center;">${tieneThumb(p.modelo) ? '<span style="color:var(--success-color);font-size:1.1rem;">✓</span>' : '<span style="color:#999;font-size:0.75rem;">—</span>'}</td>
             <td>
                 <div class="acciones-cell">
                     <button class="btn btn-editar" data-id="${p.id}" style="font-size:0.85rem;padding:6px 14px;">Editar</button>
@@ -449,3 +450,83 @@ function contenedorHojasSVG(container) {
     for (var i = 0; i < 22; i++) { setTimeout(crear, i * 200); }
     setInterval(crear, 900);
 }
+
+// === THUMBNAILS ===
+function tieneThumb(modelName) {
+    try {
+        return !!localStorage.getItem('thumb_' + modelName);
+    } catch(e) { return false; }
+}
+
+document.getElementById('btnGenerarThumbs')?.addEventListener('click', function() {
+    var productos = obtenerProductos();
+    var sinThumb = productos.filter(function(p) { return !tieneThumb(p.modelo); });
+    if (sinThumb.length === 0) {
+        document.getElementById('thumbProgress').textContent = '✓ Todos los productos ya tienen thumbnail.';
+        return;
+    }
+
+    var progress = document.getElementById('thumbProgress');
+    var btn = this;
+    btn.disabled = true;
+    progress.innerHTML = 'Generando ' + sinThumb.length + ' thumbnails... (abre la consola si el navegador bloquea múltiples descargas)';
+
+    // Crear model-viewer oculto para capturar screenshots
+    var viewer = document.createElement('model-viewer');
+    viewer.style.cssText = 'position:fixed;left:-9999px;top:0;width:400px;height:400px;z-index:-1;';
+    viewer.setAttribute('reveal', 'auto');
+    viewer.setAttribute('loading', 'eager');
+    viewer.setAttribute('alt', '');
+    document.body.appendChild(viewer);
+
+    var idx = 0;
+
+    function capturarSiguiente() {
+        if (idx >= sinThumb.length) {
+            viewer.remove();
+            btn.disabled = false;
+            renderizarTabla();
+            progress.innerHTML = '<span style="color:var(--success-color);font-weight:600;">✓ Thumbnails generados (' + sinThumb.length + ' productos)</span>';
+            return;
+        }
+
+        var p = sinThumb[idx];
+        var ruta = '../assets/' + p.modelo;
+        progress.textContent = '[' + (idx + 1) + '/' + sinThumb.length + '] ' + p.nombre + '...';
+
+        function onLoad() {
+            try {
+                setTimeout(function() {
+                    try {
+                        var dataUrl = viewer.toDataURL('image/jpeg', 0.7);
+                        if (dataUrl && dataUrl.length < 300000) {
+                            localStorage.setItem('thumb_' + p.modelo, dataUrl);
+                        }
+                    } catch(e) {}
+                    viewer.removeEventListener('load', onLoad);
+                    viewer.removeEventListener('error', onError);
+                    idx++;
+                    capturarSiguiente();
+                }, 500);
+            } catch(e) {
+                viewer.removeEventListener('load', onLoad);
+                viewer.removeEventListener('error', onError);
+                idx++;
+                capturarSiguiente();
+            }
+        }
+
+        function onError() {
+            viewer.removeEventListener('load', onLoad);
+            viewer.removeEventListener('error', onError);
+            idx++;
+            capturarSiguiente();
+        }
+
+        viewer.addEventListener('load', onLoad);
+        viewer.addEventListener('error', onError);
+        viewer.setAttribute('src', ruta);
+    }
+
+    capturarSiguiente();
+});
