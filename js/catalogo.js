@@ -496,7 +496,7 @@ function abrirModalModelo(wrapper) {
     addBtn.dataset.sub = p.subtitulo;
     addBtn.dataset.precio = p.precio;
 
-    viewerContainer.innerHTML = '<div class="model-modal-placeholder"><div class="model-skeleton"></div></div>';
+    viewerContainer.innerHTML = '<div class="model-modal-loading">Cargando modelo 3D…</div>';
 
     modal.classList.remove('oculto');
     document.body.style.overflow = 'hidden';
@@ -507,8 +507,7 @@ function abrirModalModelo(wrapper) {
         viewer.className = 'model-viewer modal-viewer';
         viewer.setAttribute('alt', p.nombre);
         viewer.setAttribute('camera-controls', '');
-        viewer.setAttribute('shadow-intensity', '0.5');
-        viewer.setAttribute('exposure', '1');
+        viewer.setAttribute('exposure', isMobile() ? '0.8' : '1');
         viewer.setAttribute('reveal', 'auto');
         viewer.setAttribute('loading', 'eager');
 
@@ -530,7 +529,7 @@ function cerrarModalModelo() {
     modalWrapperActual = null;
     const modal = document.getElementById('model-modal');
     const viewerContainer = document.getElementById('model-modal-viewer');
-    viewerContainer.innerHTML = '<div class="model-modal-placeholder"><div class="model-skeleton"></div></div>';
+    viewerContainer.innerHTML = '<div class="model-modal-loading">Cargando modelo 3D…</div>';
     modal.classList.add('oculto');
     document.body.style.overflow = '';
 }
@@ -627,6 +626,20 @@ window.addEventListener('scroll', function() {
         limpiarViewersLejanos();
     }, 300);
 }, { passive: true });
+
+// === DETECCIÓN DE PÉRDIDA WEBGL ===
+var webglPerdido = false;
+document.addEventListener('webglcontextlost', function(e) {
+    webglPerdido = true;
+    mostrarToast('Visor 3D no disponible en este dispositivo');
+    document.querySelectorAll('model-viewer').forEach(function(v) {
+        v.removeAttribute('src');
+        v.remove();
+    });
+    document.querySelectorAll('.card-viewer-wrapper').forEach(function(w) {
+        w.dataset.cargando = 'true';
+    });
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     renderizarCatalogo();

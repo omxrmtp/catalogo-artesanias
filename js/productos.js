@@ -1,6 +1,6 @@
 const PRODUCTOS_DEFAULT = [
     // === Oso de Anteojos ===
-    { id: 1, nombre: 'Peluche Pequeño', subtitulo: 'Colección Oso de Anteojos', precio: 'S/ 10.00', modelo: 'peluche_pequeño_de_oso_de_anteojos.glb', coleccion: 'Colección Oso de Anteojos' },
+    { id: 1, nombre: 'Peluche Pequeño', subtitulo: 'Colección Oso de Anteojos', precio: 'S/ 10.00', modelo: 'peluche_pequeno_de_oso_de_anteojos.glb', coleccion: 'Colección Oso de Anteojos' },
     { id: 2, nombre: 'Peluche Estándar', subtitulo: 'Colección Oso de Anteojos', precio: 'S/ 25.00', modelo: 'peluche_de_oso_de_anteojos.glb', coleccion: 'Colección Oso de Anteojos' },
     { id: 3, nombre: 'Peluche Mediano', subtitulo: 'Colección Oso de Anteojos', precio: 'S/ 15.00', modelo: 'peluche_mediano_de_oso_de_anteojos.glb', coleccion: 'Colección Oso de Anteojos' },
     { id: 4, nombre: 'Llavero Cara', subtitulo: 'Colección Oso de Anteojos', precio: 'S/ 6.00', modelo: 'llavero_de_cara_de_oso_de_anteojos.glb', coleccion: 'Colección Oso de Anteojos' },
@@ -11,9 +11,9 @@ const PRODUCTOS_DEFAULT = [
     { id: 7, nombre: 'Peluche Estándar', subtitulo: 'Colección Zorro Costero', precio: 'S/ 25.00', modelo: 'peluche_de_zorro_costero.glb', coleccion: 'Prototipo de Productos - Fauna Regional' },
     { id: 8, nombre: 'Peluche Estándar', subtitulo: 'Colección Urraca de Cola Blanca', precio: 'S/ 25.00', modelo: 'peluche_de_urraca_de_cola_blanca.glb', coleccion: 'Prototipo de Productos - Fauna Regional' },
     { id: 9, nombre: 'Peluche Estándar', subtitulo: 'Colección Pava Aliblanca', precio: 'S/ 25.00', modelo: 'peluche_de_pava_aliblanca.glb', coleccion: 'Prototipo de Productos - Fauna Regional' },
-    { id: 10, nombre: 'Peluche Pequeño', subtitulo: 'Colección Zorro Costero', precio: 'S/ 12.00', modelo: 'peluche_de_pequeño_de_zorro_costero.glb', coleccion: 'Prototipo de Productos - Fauna Regional' },
-    { id: 11, nombre: 'Peluche Pequeño', subtitulo: 'Colección Urraca de Cola Blanca', precio: 'S/ 12.00', modelo: 'peluche_pequeño_de_urraca_de_cola_blanca.glb', coleccion: 'Prototipo de Productos - Fauna Regional' },
-    { id: 12, nombre: 'Peluche Pequeño', subtitulo: 'Colección Pava Aliblanca', precio: 'S/ 25.00', modelo: 'peluche_pequeño_de_pava_aliblanca.glb', coleccion: 'Prototipo de Productos - Fauna Regional' },
+    { id: 10, nombre: 'Peluche Pequeño', subtitulo: 'Colección Zorro Costero', precio: 'S/ 12.00', modelo: 'peluche_de_pequeno_de_zorro_costero.glb', coleccion: 'Prototipo de Productos - Fauna Regional' },
+    { id: 11, nombre: 'Peluche Pequeño', subtitulo: 'Colección Urraca de Cola Blanca', precio: 'S/ 12.00', modelo: 'peluche_pequeno_de_urraca_de_cola_blanca.glb', coleccion: 'Prototipo de Productos - Fauna Regional' },
+    { id: 12, nombre: 'Peluche Pequeño', subtitulo: 'Colección Pava Aliblanca', precio: 'S/ 25.00', modelo: 'peluche_pequeno_de_pava_aliblanca.glb', coleccion: 'Prototipo de Productos - Fauna Regional' },
     { id: 13, nombre: 'Llavero Cuerpo Entero', subtitulo: 'Colección Zorro Costero', precio: 'S/ 6.00', modelo: 'llavero_de_zorro_costero.glb', coleccion: 'Prototipo de Productos - Fauna Regional' },
     { id: 14, nombre: 'Llavero Cuerpo Entero', subtitulo: 'Colección Urraca de Cola Blanca', precio: 'S/ 8.00', modelo: 'llavero_de_urraca_de_cola_blanca.glb', coleccion: 'Prototipo de Productos - Fauna Regional' },
     { id: 15, nombre: 'Llavero Cuerpo Entero', subtitulo: 'Colección Pava Aliblanca', precio: 'S/ 6.00', modelo: 'llavero_de_pava_aliblanca.glb', coleccion: 'Prototipo de Productos - Fauna Regional' },
