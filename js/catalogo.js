@@ -267,11 +267,12 @@ function animateCards() {
 
 function lazyLoadModels() {
     const wrappers = document.querySelectorAll('.card-viewer-wrapper');
+    const mobile = isMobile();
 
-    if (isMobile()) {
+    if (mobile) {
         wrappers.forEach(w => {
             const badge = w.querySelector('.instruction-badge');
-            if (badge) badge.textContent = '👆 Toca para ver en 3D';
+            if (badge) badge.textContent = 'Ver en 3D';
 
             let touchStartY, touchStartX;
 
@@ -290,7 +291,6 @@ function lazyLoadModels() {
                 abrirModalModelo(w);
             }, { passive: true });
         });
-        return;
     }
 
     if ('IntersectionObserver' in window) {
@@ -301,7 +301,7 @@ function lazyLoadModels() {
                     observer.unobserve(entry.target);
                 }
             });
-        }, { rootMargin: '400px' });
+        }, { rootMargin: mobile ? '100px' : '400px' });
         wrappers.forEach(w => observer.observe(w));
     } else {
         wrappers.forEach(cargarModelo);
@@ -354,11 +354,11 @@ function crearViewerEnWrapper(wrapper, modelName, mobile) {
     viewer.className = 'model-viewer lazy';
     viewer.setAttribute('alt', 'Modelo 3D');
     viewer.setAttribute('reveal', 'auto');
-    viewer.setAttribute('loading', 'eager');
+    viewer.setAttribute('loading', mobile ? 'lazy' : 'eager');
+    viewer.setAttribute('auto-rotate', '');
 
     if (!mobile) {
         viewer.setAttribute('camera-controls', '');
-        viewer.setAttribute('auto-rotate', '');
         viewer.setAttribute('shadow-intensity', '1');
         viewer.setAttribute('exposure', '1');
     }
@@ -369,6 +369,14 @@ function crearViewerEnWrapper(wrapper, modelName, mobile) {
         viewer.classList.add('loaded');
         const ph = wrapper.querySelector('.model-placeholder');
         if (ph) ph.style.display = 'none';
+        const badge = wrapper.querySelector('.instruction-badge');
+        if (badge) badge.style.display = 'none';
+        if (mobile && !wrapper.querySelector('.ver-3d-btn')) {
+            const overlay = document.createElement('div');
+            overlay.className = 'ver-3d-btn';
+            overlay.textContent = 'Ver en 3D';
+            wrapper.appendChild(overlay);
+        }
         viewer.removeEventListener('load', onLoad);
     });
 
@@ -429,8 +437,8 @@ function limpiarViewersViejos(exceptoWrapper) {
 var modalWrapperActual = null;
 
 function abrirModalModelo(wrapper) {
-    if (wrapper.dataset.cargando === 'true') return;
-    wrapper.dataset.cargando = 'true';
+    const modal = document.getElementById('model-modal');
+    if (!modal?.classList.contains('oculto')) return;
     modalWrapperActual = wrapper;
 
     const modelName = wrapper.dataset.model;
@@ -440,7 +448,6 @@ function abrirModalModelo(wrapper) {
     const p = productos.find(x => x.modelo === modelName);
     if (!p) return;
 
-    const modal = document.getElementById('model-modal');
     const viewerContainer = document.getElementById('model-modal-viewer');
     document.getElementById('model-modal-name').textContent = p.nombre;
     document.getElementById('model-modal-price').textContent = p.precio;
@@ -482,10 +489,7 @@ function abrirModalModelo(wrapper) {
 }
 
 function cerrarModalModelo() {
-    if (modalWrapperActual) {
-        modalWrapperActual.dataset.cargando = 'false';
-        modalWrapperActual = null;
-    }
+    modalWrapperActual = null;
     const modal = document.getElementById('model-modal');
     const viewerContainer = document.getElementById('model-modal-viewer');
     viewerContainer.innerHTML = '<div class="model-modal-placeholder"><div class="model-skeleton"></div></div>';

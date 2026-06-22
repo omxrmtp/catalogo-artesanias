@@ -47,6 +47,7 @@ body {
     align-items: center;
     min-height: 100vh;
     position: relative;
+    overflow-x: hidden;
 }
 
 body::before {
@@ -1074,12 +1075,19 @@ footer p {
 @media (max-width: 480px) {
     body { padding: 10px; }
 
+    body {
+        background-attachment: scroll, scroll, scroll;
+    }
+
     header {
         padding: 18px 14px;
         padding-bottom: 28px;
         gap: 10px;
         margin-bottom: 24px;
         clip-path: ellipse(100% 94% at 50% 6%);
+    }
+    header::before, header::after {
+        display: none;
     }
     .header-logo {
         width: 56px;
@@ -1214,6 +1222,31 @@ footer p {
         right: 14px;
     }
     .btn-admin::after { display: none; }
+}
+
+@media (max-width: 359px) {
+    .catalog-container {
+        grid-template-columns: 1fr;
+    }
+    .card-viewer-wrapper {
+        height: 220px;
+    }
+    .product-title {
+        font-size: 0.95rem;
+    }
+    .product-meta {
+        flex-direction: column;
+        gap: 6px;
+    }
+    .btn-cart-add {
+        width: 100%;
+        text-align: center;
+    }
+    .ver-3d-btn {
+        bottom: 10px;
+        padding: 5px 12px;
+        font-size: 0.68rem;
+    }
 }
 
 #leaf-container {
@@ -1383,5 +1416,36 @@ footer p {
     }
     .model-modal-viewer model-viewer {
         min-height: 0;
+    }
+}
+
+/* Botón "Ver en 3D" en mobile */
+.ver-3d-btn {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(59, 82, 64, 0.85);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    z-index: 5;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    white-space: nowrap;
+    opacity: 0.92;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.18);
+    letter-spacing: 0.3px;
+    pointer-events: none;
+}
+
+@media (max-width: 480px) {
+    .ver-3d-btn {
+        bottom: 12px;
+        padding: 6px 14px;
+        font-size: 0.72rem;
     }
 }
