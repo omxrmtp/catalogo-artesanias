@@ -305,6 +305,7 @@ function lazyLoadModels() {
                 abrirModalModelo(w);
             }, { passive: true });
         });
+        return;
     }
 
     if ('IntersectionObserver' in window) {
