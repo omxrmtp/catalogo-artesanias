@@ -10,6 +10,9 @@ function esConexionLenta() {
 }
 
 var maxViewersActivos = 2;
+var modelObserver = null;
+var colaCarga = [];
+var cargandoCola = false;
 
 function renderizarCatalogo() {
     const productos = obtenerProductos();
@@ -265,6 +268,17 @@ function animateCards() {
     }
 }
 
+function procesarCola() {
+    if (cargandoCola || colaCarga.length === 0) return;
+    cargandoCola = true;
+    var wrapper = colaCarga.shift();
+    cargarModelo(wrapper);
+    setTimeout(function() {
+        cargandoCola = false;
+        procesarCola();
+    }, 600);
+}
+
 function lazyLoadModels() {
     const wrappers = document.querySelectorAll('.card-viewer-wrapper');
     const mobile = isMobile();
@@ -297,11 +311,13 @@ function lazyLoadModels() {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    cargarModelo(entry.target);
                     observer.unobserve(entry.target);
+                    colaCarga.push(entry.target);
+                    procesarCola();
                 }
             });
         }, { rootMargin: mobile ? '100px' : '400px' });
+        modelObserver = observer;
         wrappers.forEach(w => observer.observe(w));
     } else {
         wrappers.forEach(cargarModelo);
@@ -356,11 +372,11 @@ function crearViewerEnWrapper(wrapper, modelName, mobile) {
     viewer.setAttribute('reveal', 'auto');
     viewer.setAttribute('loading', mobile ? 'lazy' : 'eager');
     viewer.setAttribute('auto-rotate', '');
+    viewer.setAttribute('exposure', mobile ? '0.8' : '1');
 
     if (!mobile) {
         viewer.setAttribute('camera-controls', '');
         viewer.setAttribute('shadow-intensity', '1');
-        viewer.setAttribute('exposure', '1');
     }
 
     const ruta = 'assets/' + modelName;
@@ -376,6 +392,14 @@ function crearViewerEnWrapper(wrapper, modelName, mobile) {
             overlay.className = 'ver-3d-btn';
             overlay.textContent = 'Ver en 3D';
             wrapper.appendChild(overlay);
+        }
+        if (mobile) {
+            limpiarViewersViejos(wrapper);
+            setTimeout(function() {
+                if (viewer.getAttribute('auto-rotate') !== null) {
+                    viewer.removeAttribute('auto-rotate');
+                }
+            }, 8000);
         }
         viewer.removeEventListener('load', onLoad);
     });
@@ -428,6 +452,7 @@ function limpiarViewersViejos(exceptoWrapper) {
             mv.classList.remove('loaded');
             mv.remove();
             item.wrapper.dataset.cargando = 'false';
+            if (modelObserver) modelObserver.observe(item.wrapper);
             loaded = document.querySelectorAll('model-viewer.loaded');
         }
     }
@@ -518,6 +543,58 @@ function initCarrito() {
         cerrarModalModelo();
     });
 }
+
+// === OPTIMIZACIONES MOBILE ===
+function pausarAutoRotate() {
+    document.querySelectorAll('model-viewer.loaded').forEach(function(v) {
+        if (v.getAttribute('auto-rotate') !== null) {
+            v.dataset.autoRotate = 'true';
+            v.removeAttribute('auto-rotate');
+        }
+    });
+}
+
+function reanudarAutoRotate() {
+    if (!isMobile()) return;
+    document.querySelectorAll('model-viewer.loaded').forEach(function(v) {
+        if (v.dataset.autoRotate === 'true') {
+            v.setAttribute('auto-rotate', '');
+            v.removeAttribute('data-auto-rotate');
+        }
+    });
+}
+
+function limpiarViewersLejanos() {
+    if (!isMobile()) return;
+    var loaded = document.querySelectorAll('model-viewer.loaded');
+    var viewportCenter = window.innerHeight / 2 + window.scrollY;
+    loaded.forEach(function(v) {
+        var rect = v.getBoundingClientRect();
+        var center = rect.top + rect.height / 2 + window.scrollY;
+        var dist = Math.abs(center - viewportCenter);
+        if (dist > window.innerHeight * 2) {
+            v.removeAttribute('src');
+            v.classList.remove('loaded');
+            v.remove();
+            var w = v.parentElement;
+            if (w) {
+                w.dataset.cargando = 'false';
+                if (modelObserver) modelObserver.observe(w);
+            }
+        }
+    });
+}
+
+var scrollTimeout;
+window.addEventListener('scroll', function() {
+    if (!isMobile()) return;
+    pausarAutoRotate();
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(function() {
+        reanudarAutoRotate();
+        limpiarViewersLejanos();
+    }, 300);
+}, { passive: true });
 
 document.addEventListener('DOMContentLoaded', function() {
     renderizarCatalogo();
