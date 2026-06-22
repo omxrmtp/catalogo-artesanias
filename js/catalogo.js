@@ -272,13 +272,10 @@ function lazyLoadModels() {
         wrappers.forEach(w => {
             const badge = w.querySelector('.instruction-badge');
             if (badge) badge.textContent = '👆 Toca para ver en 3D';
-            w.style.cursor = 'pointer';
-            w.addEventListener('click', function onClick() {
-                w.removeEventListener('click', onClick);
-                cargarModelo(w);
-            }, { once: true });
         });
-    } else if ('IntersectionObserver' in window) {
+    }
+
+    if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
