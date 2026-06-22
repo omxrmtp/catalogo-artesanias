@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Virtual 3D - CHAPARRI - ACOTURCH</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Catálogo virtual interactivo 3D de artesanías CHAPARRI - ACOTURCH.">
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header>
+        <img src="assets/logo-mochica.png" alt="Logo Artesanía Mochica" class="header-logo">
+        <div class="header-textos">
+            <h1>CHAPARRI - ACOTURCH</h1>
+            <p>Catálogo Virtual Interactivo 3D</p>
+        </div>
+    </header>
+
+    <main></main>
+
+    <footer>
+        <p>&copy; 2026 CHAPARRI &mdash; ACOTURCH. Artesanía peruana en 3D.</p>
+        <span class="footer-divider"></span>
+        <a href="admin/index.html" class="footer-admin-link">Panel de Administración</a>
+    </footer>
+
+    <!-- Carrito flotante -->
+    <button id="cart-fab" class="cart-fab" title="Abrir carrito">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span id="cart-count" class="cart-count">0</span>
+    </button>
+
+    <!-- Overlay -->
+    <div id="cart-overlay" class="cart-overlay"></div>
+
+    <!-- Panel carrito -->
+    <div id="cart-panel" class="cart-panel">
+        <div class="cart-panel-header">
+            <h2>Carrito</h2>
+            <button id="cart-close" class="cart-close">✕</button>
+        </div>
+
+        <div class="cart-panel-body">
+            <div id="cart-vacio" class="cart-vacio">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                <p>Tu carrito está vacío</p>
+            </div>
+            <div id="cart-items-list" class="cart-items-list"></div>
+        </div>
+
+        <div class="cart-panel-footer">
+            <div class="cart-total-row">
+                <span>Total</span>
+                <span id="cart-total-price">S/ 0.00</span>
+            </div>
+            <button id="cart-order-btn" class="btn-order-cart" disabled>
+                Ordenar por WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <a href="admin/index.html" class="btn-admin" title="Panel de Administración">⚙</a>
+
+    <div id="leaf-container"></div>
+
+    <script src="js/productos.js"></script>
+    <script src="js/catalogo.js"></script>
+</body>
+</html>

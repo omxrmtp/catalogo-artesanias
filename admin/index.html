@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - CHAPARRI</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    <style>
+        .admin-wrapper {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .admin-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.03);
+            border: 1px solid rgba(59,82,64,0.08);
+        }
+
+        .admin-card h2 {
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-size: 1.6rem;
+        }
+
+        .form-login {
+            max-width: 400px;
+            margin: 60px auto;
+        }
+
+        .form-login .admin-card {
+            padding: 40px 30px;
+        }
+
+        .form-login h2 {
+            text-align: center;
+        }
+
+        .campo {
+            margin-bottom: 20px;
+        }
+
+        .campo label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+
+        .campo input, .campo select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d0dcd0;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: #fafcfa;
+            transition: border-color 0.2s;
+        }
+
+        .campo input:focus, .campo select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #2b3d30;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        .btn-danger:hover {
+            background-color: #a93226;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+        }
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .tabla-productos {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .tabla-productos th {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 2px solid var(--viewer-bg);
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        .tabla-productos td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--viewer-bg);
+            font-size: 0.95rem;
+        }
+
+        .tabla-productos tr:hover td {
+            background-color: #f4f9f4;
+        }
+
+        .acciones-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .acciones-cell .btn {
+            padding: 6px 14px;
+            font-size: 0.85rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .admin-header h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .admin-header a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .admin-header a:hover {
+            text-decoration: underline;
+        }
+
+        .mensaje {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .mensaje.exito {
+            background: #d5f5e3;
+            color: #1e8449;
+            display: block;
+        }
+
+        .mensaje.error {
+            background: #fadbd8;
+            color: #922b21;
+            display: block;
+        }
+
+        .oculto {
+            display: none !important;
+        }
+
+        .volver-catalogo {
+            margin-bottom: 20px;
+            display: inline-block;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .volver-catalogo:hover {
+            text-decoration: underline;
+        }
+
+        #formProducto {
+            background: #f4f9f4;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        #formProducto h3 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .modelo-upload-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .modelo-upload-row #modelo {
+            flex: 1;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .file-input-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 18px;
+            background: var(--primary-color);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .file-input-wrapper:hover .file-input-label {
+            background: #2b3d30;
+        }
+
+        .modelo-ayuda {
+            display: block;
+            margin-top: 6px;
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            line-height: 1.4;
+        }
+
+        #modelo-preview-container {
+            margin-top: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #e2ebe2;
+            position: relative;
+        }
+
+        #preview-model {
+            width: 100%;
+            height: 220px;
+            display: block;
+        }
+
+        .modelo-preview-label {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            background: rgba(0,0,0,0.55);
+            color: #fff;
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .admin-card { padding: 20px; }
+            .form-row { grid-template-columns: 1fr; }
+            .tabla-productos { font-size: 0.85rem; }
+            .tabla-productos th, .tabla-productos td { padding: 8px 6px; }
+            .acciones-cell { flex-direction: column; }
+            .admin-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+            .admin-header h1 { font-size: 1.4rem; }
+        }
+
+        @media (max-width: 480px) {
+            .admin-card { padding: 12px; }
+            .admin-header h1 { font-size: 1.1rem; }
+            .tabla-productos { font-size: 0.75rem; }
+            .tabla-productos th, .tabla-productos td { padding: 6px 4px; }
+            .tabla-productos th:nth-child(5), .tabla-productos td:nth-child(5) { display: none; }
+            #formProducto { padding: 14px; }
+            .campo { margin-bottom: 12px; }
+            .campo input, .campo select { padding: 10px 12px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-wrapper">
+
+        <!-- === LOGIN === -->
+        <div id="loginSection" class="form-login">
+            <div class="admin-card">
+                <h2>Iniciar Sesión</h2>
+                <div id="loginMensaje" class="mensaje error"></div>
+                <form id="loginForm">
+                    <div class="campo">
+                        <label for="username">Usuario</label>
+                        <input type="text" id="username" name="username" placeholder="admin" required>
+                    </div>
+                    <div class="campo">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" placeholder="••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-block">Ingresar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- === PANEL ADMIN === -->
+        <div id="panelSection" class="oculto">
+            <div class="admin-header">
+                <div>
+                    <a href="../index.html" class="volver-catalogo">&larr; Volver al Catálogo</a>
+                    <h1>Panel de Administración</h1>
+                </div>
+                <button id="btnLogout" class="btn btn-secondary">Cerrar Sesión</button>
+            </div>
+
+            <div class="admin-card">
+                <div id="panelMensaje" class="mensaje"></div>
+
+                <h2>Agregar / Editar Producto</h2>
+                <form id="formProducto">
+                    <input type="hidden" id="editId" value="">
+                    <div class="campo">
+                        <label for="nombre">Nombre del Producto</label>
+                        <input type="text" id="nombre" name="nombre" placeholder="Ej: Peluche Estándar" required>
+                    </div>
+                    <div class="campo">
+                        <label for="subtitulo">Subtítulo</label>
+                        <input type="text" id="subtitulo" name="subtitulo" placeholder="Ej: Colección Oso de Anteojos" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="campo">
+                            <label for="precio">Precio</label>
+                            <input type="text" id="precio" name="precio" placeholder="Ej: S/ 25.00" required>
+                        </div>
+                        <div class="campo">
+                            <label for="coleccion">Colección</label>
+                            <select id="coleccion" name="coleccion" required>
+                                <option value="">Seleccionar colección...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="campo">
+                        <label for="modeloFile">Archivo 3D (.glb)</label>
+                        <div class="modelo-upload-row">
+                            <div class="file-input-wrapper">
+                                <input type="file" id="modeloFile" accept=".glb,.gltf">
+                                <span class="file-input-label">Seleccionar archivo</span>
+                            </div>
+                            <input type="text" id="modelo" name="modelo" placeholder="nombre-del-archivo.glb" required>
+                        </div>
+                        <small class="modelo-ayuda">
+                            Selecciona un archivo .glb de tu computadora — el nombre se autocompleta.
+                            Para que funcione en el catálogo, copia el archivo a la carpeta <strong>assets/</strong> del sitio.
+                        </small>
+                        <div id="modelo-preview-container" class="oculto">
+                            <model-viewer id="preview-model" alt="Vista previa 3D" camera-controls auto-rotate></model-viewer>
+                            <p class="modelo-preview-label">Vista previa</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit" class="btn" id="btnGuardar">Guardar Producto</button>
+                        <button type="button" class="btn btn-secondary" id="btnCancelar" style="display: none;">Cancelar</button>
+                    </div>
+                </form>
+
+                <h2 style="margin-top: 40px;">Productos Registrados</h2>
+                <div id="tablaContainer">
+                    <table class="tabla-productos">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Colección</th>
+                                <th>Precio</th>
+                                <th>Modelo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="leaf-container"></div>
+
+    <script src="../js/productos.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

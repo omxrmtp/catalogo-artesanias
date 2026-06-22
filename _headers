@@ -1,0 +1,8 @@
+/assets/*
+  Content-Type: model/gltf-binary
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+/*.glb
+  Content-Type: model/gltf-binary
+  Cache-Control: public, max-age=31536000, immutable
