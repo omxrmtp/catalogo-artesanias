@@ -410,6 +410,8 @@ function crearViewerEnWrapper(wrapper, modelName, mobile) {
         if (badge) badge.style.display = 'none';
 
         if (!mobile) {
+            var originalBg = viewer.style.background;
+            viewer.style.background = '#e2ebe2';
             requestAnimationFrame(function() {
                 setTimeout(function() {
                     try {
@@ -418,6 +420,7 @@ function crearViewerEnWrapper(wrapper, modelName, mobile) {
                             localStorage.setItem('thumb_' + modelName, dataUrl);
                         }
                     } catch (e) {}
+                    viewer.style.background = originalBg || '';
                 }, 200);
             });
         }

@@ -495,6 +495,8 @@ document.getElementById('btnGenerarThumbs')?.addEventListener('click', function(
         progress.textContent = '[' + (idx + 1) + '/' + sinThumb.length + '] ' + p.nombre + '...';
 
         function onLoad() {
+            var originalBg = viewer.style.background;
+            viewer.style.background = '#e2ebe2';
             requestAnimationFrame(function() {
                 setTimeout(function() {
                     try {
@@ -503,6 +505,7 @@ document.getElementById('btnGenerarThumbs')?.addEventListener('click', function(
                             localStorage.setItem('thumb_' + p.modelo, dataUrl);
                         }
                     } catch(e) {}
+                    viewer.style.background = originalBg || '';
                     viewer.removeEventListener('load', onLoad);
                     viewer.removeEventListener('error', onError);
                     idx++;
