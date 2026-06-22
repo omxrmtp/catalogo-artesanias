@@ -495,11 +495,11 @@ document.getElementById('btnGenerarThumbs')?.addEventListener('click', function(
         progress.textContent = '[' + (idx + 1) + '/' + sinThumb.length + '] ' + p.nombre + '...';
 
         function onLoad() {
-            try {
+            requestAnimationFrame(function() {
                 setTimeout(function() {
                     try {
                         var dataUrl = viewer.toDataURL('image/jpeg', 0.7);
-                        if (dataUrl && dataUrl.length < 300000) {
+                        if (dataUrl && dataUrl.length > 1000) {
                             localStorage.setItem('thumb_' + p.modelo, dataUrl);
                         }
                     } catch(e) {}
@@ -507,13 +507,8 @@ document.getElementById('btnGenerarThumbs')?.addEventListener('click', function(
                     viewer.removeEventListener('error', onError);
                     idx++;
                     capturarSiguiente();
-                }, 500);
-            } catch(e) {
-                viewer.removeEventListener('load', onLoad);
-                viewer.removeEventListener('error', onError);
-                idx++;
-                capturarSiguiente();
-            }
+                }, 200);
+            });
         }
 
         function onError() {
