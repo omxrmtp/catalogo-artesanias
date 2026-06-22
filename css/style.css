@@ -367,54 +367,6 @@ main::after {
     to { transform: rotate(360deg); }
 }
 
-.model-thumb-container {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    background: var(--viewer-bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.model-thumb {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.thumb-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    color: var(--accent-color);
-    text-align: center;
-    padding: 10px;
-}
-
-.thumb-initial {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: rgba(127, 161, 133, 0.12);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--primary-color);
-}
-
-.thumb-name {
-    font-size: 0.75rem;
-    line-height: 1.3;
-    opacity: 0.7;
-}
-
 .model-error {
     color: var(--danger-color);
     font-size: 0.9rem;

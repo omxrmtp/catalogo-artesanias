@@ -52,7 +52,9 @@ function renderizarCatalogo() {
             card.innerHTML = `
                 <div class="card-viewer-wrapper" data-model="${p.modelo}">
                     <div class="instruction-badge">⟳ Rota en 3D</div>
-                    <div class="model-thumb-container"></div>
+                    <div class="model-placeholder">
+                        <div class="model-skeleton"></div>
+                    </div>
                 </div>
                 <div class="product-info">
                     <div class="product-title">${p.nombre}</div>
@@ -82,29 +84,7 @@ function renderizarCatalogo() {
     });
 
     lazyLoadModels();
-    animarThumbs();
     animateCards();
-}
-
-function animarThumbs() {
-    document.querySelectorAll('.card-viewer-wrapper').forEach(function(w) {
-        var modelName = w.dataset.model;
-        if (!modelName) return;
-        var container = w.querySelector('.model-thumb-container');
-        if (!container) return;
-
-        var key = 'thumb_' + modelName;
-        var saved = localStorage.getItem(key);
-
-        if (saved) {
-            container.innerHTML = '<img class="model-thumb" src="' + saved + '" alt="" loading="lazy">';
-        } else {
-            var card = w.closest('.product-card');
-            var nombre = card ? (card.querySelector('.product-title')?.textContent || '') : '';
-            var inicial = nombre.charAt(0) || '?';
-            container.innerHTML = '<div class="thumb-placeholder"><span class="thumb-initial">' + inicial + '</span><span class="thumb-name">' + nombre + '</span></div>';
-        }
-    });
 }
 
 function agregarAlCarrito(producto) {
@@ -337,7 +317,6 @@ function lazyLoadModels() {
                 abrirModalModelo(w);
             }, { passive: true });
         });
-        return;
     }
 
     if ('IntersectionObserver' in window) {
@@ -382,8 +361,8 @@ function cargarModelo(wrapper) {
     const mobile = isMobile();
 
     if (mobile && esConexionLenta()) {
-        var tc = wrapper.querySelector('.model-thumb-container');
-        if (tc) tc.innerHTML = '<div class="model-error" style="font-size:0.85rem;padding:20px;">Conexión muy lenta.<br>Ver disponible en desktop.</div>';
+        var ph = wrapper.querySelector('.model-placeholder');
+        if (ph) ph.innerHTML = '<div class="model-error" style="font-size:0.85rem;padding:20px;">Conexión muy lenta.<br>Ver disponible en desktop.</div>';
         const badge = wrapper.querySelector('.instruction-badge');
         if (badge) badge.textContent = '🌐 No disponible';
         return;
@@ -393,8 +372,8 @@ function cargarModelo(wrapper) {
     cargarModelViewerScript().then(function() {
         crearViewerEnWrapper(wrapper, modelName, mobile);
     }).catch(function() {
-        var tc = wrapper.querySelector('.model-thumb-container');
-        if (tc) tc.innerHTML = '<div class="model-error">Error al cargar el visor 3D.<br>Verifica tu conexión.</div>';
+        var ph = wrapper.querySelector('.model-placeholder');
+        if (ph) ph.innerHTML = '<div class="model-error">Error al cargar el visor 3D.<br>Verifica tu conexión.</div>';
     });
 }
 
@@ -416,25 +395,10 @@ function crearViewerEnWrapper(wrapper, modelName, mobile) {
 
     viewer.addEventListener('load', function onLoad() {
         viewer.classList.add('loaded');
-        var tc = wrapper.querySelector('.model-thumb-container');
-        if (tc) tc.style.display = 'none';
+        var ph = wrapper.querySelector('.model-placeholder');
+        if (ph) ph.style.display = 'none';
         const badge = wrapper.querySelector('.instruction-badge');
         if (badge) badge.style.display = 'none';
-
-        if (!mobile) {
-            viewer.style.backgroundColor = '#e2ebe2';
-            requestAnimationFrame(function() {
-                requestAnimationFrame(function() {
-                    try {
-                        var dataUrl = viewer.toDataURL('image/jpeg', 0.85);
-                        if (dataUrl && dataUrl.length > 1000) {
-                            localStorage.setItem('thumb_' + modelName, dataUrl);
-                        }
-                    } catch (e) {}
-                    viewer.style.backgroundColor = '';
-                });
-            });
-        }
 
         if (mobile && !wrapper.querySelector('.ver-3d-btn')) {
             const overlay = document.createElement('div');
@@ -454,15 +418,15 @@ function crearViewerEnWrapper(wrapper, modelName, mobile) {
     });
 
     viewer.addEventListener('error', function onError(e) {
-        var tc = wrapper.querySelector('.model-thumb-container');
-        if (tc) {
+        var ph = wrapper.querySelector('.model-placeholder');
+        if (ph) {
             const detalle = e.detail ? e.detail.toString() : '';
             if (detalle.includes('404') || detalle.includes('not found')) {
-                tc.innerHTML = '<div class="model-error">Archivo no encontrado: ' + modelName + '</div>';
+                ph.innerHTML = '<div class="model-error">Archivo no encontrado: ' + modelName + '</div>';
             } else if (detalle.includes('CORS') || detalle.includes('NetworkError')) {
-                tc.innerHTML = '<div class="model-error">Debes usar un servidor local. Ejecuta <strong>servidor.bat</strong></div>';
+                ph.innerHTML = '<div class="model-error">Debes usar un servidor local. Ejecuta <strong>servidor.bat</strong></div>';
             } else {
-                tc.innerHTML = '<div class="model-error">Error al cargar el modelo 3D</div>';
+                ph.innerHTML = '<div class="model-error">Error al cargar el modelo 3D</div>';
             }
         }
         viewer.removeEventListener('error', onError);
