@@ -1537,3 +1537,11 @@ footer p {
         font-size: 0.82rem;
     }
 }
+
+@media (max-width: 480px) {
+    .model-modal-close-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
+    }
+}

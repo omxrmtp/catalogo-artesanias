@@ -579,9 +579,28 @@ function initCarrito() {
 
     // Modal events
     document.getElementById('model-modal-close')?.addEventListener('click', cerrarModalModelo);
-    document.getElementById('model-modal')?.addEventListener('click', function(e) {
-        if (e.target === this) cerrarModalModelo();
+    document.getElementById('model-modal-close')?.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        cerrarModalModelo();
     });
+    document.getElementById('model-modal')?.addEventListener('click', function(e) {
+        if (e.target === this || e.target.classList.contains('model-modal-backdrop')) {
+            cerrarModalModelo();
+        }
+    });
+
+    // Swipe down para cerrar modal en mobile
+    var modalContent = document.querySelector('.model-modal-content');
+    var touchStartY = 0;
+    modalContent?.addEventListener('touchstart', function(e) {
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    modalContent?.addEventListener('touchend', function(e) {
+        if (touchStartY === undefined) return;
+        var dy = e.changedTouches[0].clientY - touchStartY;
+        touchStartY = undefined;
+        if (dy > 80) cerrarModalModelo();
+    }, { passive: true });
     document.getElementById('model-modal-add')?.addEventListener('click', function(e) {
         e.stopPropagation();
         const id = parseInt(this.dataset.id);
