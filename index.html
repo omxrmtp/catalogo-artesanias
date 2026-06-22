@@ -6,8 +6,18 @@
     <title>Catálogo Virtual 3D - CHAPARRI - ACOTURCH</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="Catálogo virtual interactivo 3D de artesanías CHAPARRI - ACOTURCH.">
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
+    <script>
+    (function() {
+        var isMobile = ('ontouchstart' in window && window.innerWidth < 1024);
+        if (!isMobile) {
+            var s = document.createElement('script');
+            s.type = 'module';
+            s.src = 'https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js';
+            document.head.appendChild(s);
+        }
+    })();
+    </script>
 </head>
 <body>
 
@@ -65,6 +75,26 @@
     <a href="admin/index.html" class="btn-admin" title="Panel de Administración">⚙</a>
 
     <div id="leaf-container"></div>
+
+    <!-- Modal modelo 3D mobile -->
+    <div id="model-modal" class="model-modal oculto">
+        <div class="model-modal-backdrop"></div>
+        <div class="model-modal-content">
+            <div class="model-modal-header">
+                <span id="model-modal-name" class="model-modal-name"></span>
+                <button id="model-modal-close" class="model-modal-close-btn" aria-label="Cerrar">✕</button>
+            </div>
+            <div class="model-modal-viewer" id="model-modal-viewer">
+                <div class="model-modal-placeholder">
+                    <div class="model-skeleton"></div>
+                </div>
+            </div>
+            <div class="model-modal-footer">
+                <span id="model-modal-price" class="model-modal-price"></span>
+                <button id="model-modal-add" class="btn" style="font-size:0.95rem;padding:10px 20px;">Agregar al carrito</button>
+            </div>
+        </div>
+    </div>
 
     <script src="js/productos.js"></script>
     <script src="js/catalogo.js"></script>

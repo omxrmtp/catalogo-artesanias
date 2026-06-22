@@ -287,8 +287,7 @@ function lazyLoadModels() {
                 const dist = Math.sqrt(dy * dy + dx * dx);
                 touchStartY = touchStartX = undefined;
                 if (dist > 10) return;
-                if (w.dataset.cargando === 'true') return;
-                cargarModelo(w);
+                abrirModalModelo(w);
             }, { passive: true });
         });
         return;
@@ -309,6 +308,21 @@ function lazyLoadModels() {
     }
 }
 
+function cargarModelViewerScript() {
+    return new Promise(function(resolve, reject) {
+        if (typeof customElements.get('model-viewer') !== 'undefined') {
+            resolve();
+            return;
+        }
+        var s = document.createElement('script');
+        s.type = 'module';
+        s.src = 'https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js';
+        s.onload = function() { setTimeout(resolve, 100); };
+        s.onerror = reject;
+        document.head.appendChild(s);
+    });
+}
+
 function cargarModelo(wrapper) {
     if (wrapper.dataset.cargando === 'true') return;
     wrapper.dataset.cargando = 'true';
@@ -326,20 +340,27 @@ function cargarModelo(wrapper) {
         return;
     }
 
+    var _this = this;
+    cargarModelViewerScript().then(function() {
+        crearViewerEnWrapper(wrapper, modelName, mobile);
+    }).catch(function() {
+        var ph = wrapper.querySelector('.model-placeholder');
+        if (ph) ph.innerHTML = '<div class="model-error">Error al cargar el visor 3D.<br>Verifica tu conexión.</div>';
+    });
+}
+
+function crearViewerEnWrapper(wrapper, modelName, mobile) {
     const viewer = document.createElement('model-viewer');
     viewer.className = 'model-viewer lazy';
     viewer.setAttribute('alt', 'Modelo 3D');
+    viewer.setAttribute('reveal', 'auto');
+    viewer.setAttribute('loading', 'eager');
 
-    if (mobile) {
-        viewer.setAttribute('reveal', 'auto');
-        viewer.setAttribute('loading', 'eager');
-    } else {
+    if (!mobile) {
         viewer.setAttribute('camera-controls', '');
         viewer.setAttribute('auto-rotate', '');
         viewer.setAttribute('shadow-intensity', '1');
         viewer.setAttribute('exposure', '1');
-        viewer.setAttribute('reveal', 'auto');
-        viewer.setAttribute('loading', 'eager');
     }
 
     const ruta = 'assets/' + modelName;
@@ -349,7 +370,6 @@ function cargarModelo(wrapper) {
         const ph = wrapper.querySelector('.model-placeholder');
         if (ph) ph.style.display = 'none';
         viewer.removeEventListener('load', onLoad);
-        if (mobile) limpiarViewersViejos(wrapper);
     });
 
     viewer.addEventListener('error', function onError(e) {
@@ -405,11 +425,94 @@ function limpiarViewersViejos(exceptoWrapper) {
     }
 }
 
+// === MODAL MODELO 3D MOBILE ===
+var modalWrapperActual = null;
+
+function abrirModalModelo(wrapper) {
+    if (wrapper.dataset.cargando === 'true') return;
+    wrapper.dataset.cargando = 'true';
+    modalWrapperActual = wrapper;
+
+    const modelName = wrapper.dataset.model;
+    if (!modelName) return;
+
+    const productos = obtenerProductos();
+    const p = productos.find(x => x.modelo === modelName);
+    if (!p) return;
+
+    const modal = document.getElementById('model-modal');
+    const viewerContainer = document.getElementById('model-modal-viewer');
+    document.getElementById('model-modal-name').textContent = p.nombre;
+    document.getElementById('model-modal-price').textContent = p.precio;
+
+    const addBtn = document.getElementById('model-modal-add');
+    addBtn.dataset.id = p.id;
+    addBtn.dataset.nombre = p.nombre;
+    addBtn.dataset.sub = p.subtitulo;
+    addBtn.dataset.precio = p.precio;
+
+    viewerContainer.innerHTML = '<div class="model-modal-placeholder"><div class="model-skeleton"></div></div>';
+
+    modal.classList.remove('oculto');
+    document.body.style.overflow = 'hidden';
+
+    cargarModelViewerScript().then(function() {
+        viewerContainer.innerHTML = '';
+        const viewer = document.createElement('model-viewer');
+        viewer.className = 'model-viewer modal-viewer';
+        viewer.setAttribute('alt', p.nombre);
+        viewer.setAttribute('camera-controls', '');
+        viewer.setAttribute('shadow-intensity', '0.5');
+        viewer.setAttribute('exposure', '1');
+        viewer.setAttribute('reveal', 'auto');
+        viewer.setAttribute('loading', 'eager');
+
+        viewer.addEventListener('load', function onLoad() {
+            viewer.classList.add('loaded');
+            viewer.removeEventListener('load', onLoad);
+        });
+
+        viewerContainer.appendChild(viewer);
+        requestAnimationFrame(function() {
+            viewer.setAttribute('src', 'assets/' + modelName);
+        });
+    }).catch(function() {
+        viewerContainer.innerHTML = '<div class="model-error" style="padding:40px;">Error al cargar el visor 3D.<br>Verifica tu conexión.</div>';
+    });
+}
+
+function cerrarModalModelo() {
+    if (modalWrapperActual) {
+        modalWrapperActual.dataset.cargando = 'false';
+        modalWrapperActual = null;
+    }
+    const modal = document.getElementById('model-modal');
+    const viewerContainer = document.getElementById('model-modal-viewer');
+    viewerContainer.innerHTML = '<div class="model-modal-placeholder"><div class="model-skeleton"></div></div>';
+    modal.classList.add('oculto');
+    document.body.style.overflow = '';
+}
+
 function initCarrito() {
     document.getElementById('cart-fab')?.addEventListener('click', toggleCarritoPanel);
     document.getElementById('cart-close')?.addEventListener('click', toggleCarritoPanel);
     document.getElementById('cart-overlay')?.addEventListener('click', toggleCarritoPanel);
     document.getElementById('cart-order-btn')?.addEventListener('click', enviarPedidoWhatsApp);
+
+    // Modal events
+    document.getElementById('model-modal-close')?.addEventListener('click', cerrarModalModelo);
+    document.getElementById('model-modal')?.addEventListener('click', function(e) {
+        if (e.target === this) cerrarModalModelo();
+    });
+    document.getElementById('model-modal-add')?.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const id = parseInt(this.dataset.id);
+        const nombre = this.dataset.nombre;
+        const subtitulo = this.dataset.sub;
+        const precio = this.dataset.precio;
+        agregarAlCarrito({ id, nombre, subtitulo, precio });
+        cerrarModalModelo();
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -419,6 +522,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initHojaOverlay() {
+    if (isMobile()) return;
     var container = document.getElementById('leaf-container');
     if (!container) return;
 
@@ -428,7 +532,7 @@ function initHojaOverlay() {
     container.appendChild(canvas);
 
     var w, h, hojas = [], corriendo = false;
-    var maxHojas = isMobile() ? 10 : 35;
+    var maxHojas = 35;
 
     var colores = ['#3b5240','#7fa185','#5a7a5e','#4a7a4e','#6b9a6f','#8db892','#2d5a32'];
 
