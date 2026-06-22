@@ -49,11 +49,14 @@ function renderizarCatalogo() {
             card.className = 'product-card';
             card.style.setProperty('--i', cardIndex);
 
-            card.innerHTML = `
+                    const thumbName = p.modelo.replace('.glb', '.webp');
+
+                    card.innerHTML = `
                 <div class="card-viewer-wrapper" data-model="${p.modelo}">
                     <div class="instruction-badge">⟳ Rota en 3D</div>
                     <div class="model-placeholder">
                         <div class="model-skeleton"></div>
+                        <img class="model-thumbnail" src="assets/thumbs/${thumbName}" alt="${p.nombre}" loading="lazy" onerror="this.style.display='none'">
                     </div>
                 </div>
                 <div class="product-info">
@@ -300,6 +303,12 @@ function lazyLoadModels() {
             const badge = w.querySelector('.instruction-badge');
             if (badge) badge.textContent = 'Ver en 3D';
 
+            const ph = w.querySelector('.model-placeholder');
+            if (ph) {
+                const skeleton = ph.querySelector('.model-skeleton');
+                if (skeleton) skeleton.remove();
+            }
+
             let touchStartY, touchStartX;
 
             w.addEventListener('touchstart', function(e) {
@@ -317,6 +326,7 @@ function lazyLoadModels() {
                 abrirModalModelo(w);
             }, { passive: true });
         });
+        return;
     }
 
     if ('IntersectionObserver' in window) {
@@ -328,7 +338,7 @@ function lazyLoadModels() {
                     procesarCola();
                 }
             });
-        }, { rootMargin: mobile ? '100px' : '400px' });
+        }, { rootMargin: '400px' });
         modelObserver = observer;
         wrappers.forEach(w => observer.observe(w));
     } else {
