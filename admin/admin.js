@@ -22,6 +22,7 @@ function mostrarPanel() {
     panelSection.classList.remove('oculto');
     renderizarTabla();
     actualizarOpcionesColeccion();
+    mostrarEstadoModelos();
 }
 
 loginForm.addEventListener('submit', function(e) {
@@ -189,12 +190,25 @@ modeloFile.addEventListener('change', function() {
     if (!file) {
         previewContainer.classList.add('oculto');
         previewModel.src = '';
+        document.getElementById('compression-aviso')?.remove();
         return;
     }
     modelo.value = file.name;
     currentBlob = URL.createObjectURL(file);
     previewModel.src = currentBlob;
     previewContainer.classList.remove('oculto');
+
+    // Mostrar aviso de compresión
+    const existente = document.getElementById('compression-aviso');
+    if (existente) existente.remove();
+    const aviso = document.createElement('div');
+    aviso.id = 'compression-aviso';
+    aviso.style.cssText = 'margin-top:12px;padding:14px 16px;background:#fef9e7;border:1px solid #f7dc6f;border-radius:10px;font-size:0.9rem;line-height:1.5;';
+    aviso.innerHTML = '<strong>⚠ Después de guardar:</strong> Copia el archivo a <code>assets/</code> y ejecuta el script de compresión:<br>'
+        + '<code style="display:block;margin:8px 0;padding:8px 12px;background:#1a1a2e;color:#7bed9f;border-radius:6px;">node scripts/comprimir.js assets/' + file.name + '</code>'
+        + '<span style="font-size:0.85rem;color:#666;">Reduce el modelo ~85% (Draco + WebP + Quantize).<br>'
+        + 'O comprime todos los modelos nuevos de una vez con: <code>scripts\\comprimir-nuevos.ps1</code></span>';
+    modeloFile.closest('.campo').appendChild(aviso);
 });
 
 formProducto.addEventListener('submit', function(e) {
@@ -232,6 +246,7 @@ formProducto.addEventListener('submit', function(e) {
     limpiarFormulario();
     renderizarTabla();
     actualizarOpcionesColeccion();
+    mostrarEstadoModelos();
 });
 
 function eliminarProducto(id) {
@@ -241,6 +256,46 @@ function eliminarProducto(id) {
     renderizarTabla();
     actualizarOpcionesColeccion();
     mostrarMensaje('Producto eliminado correctamente.', 'exito');
+    mostrarEstadoModelos();
+}
+
+// === COMPRESIÓN DE MODELOS ===
+function mostrarEstadoModelos() {
+    const container = document.getElementById('modelos-estado');
+    if (!container) return;
+    const productos = obtenerProductos();
+    const modelosUnicos = [...new Set(productos.map(p => p.modelo).filter(Boolean))];
+    if (modelosUnicos.length === 0) {
+        container.innerHTML = '<p style="color:#95a5a6;font-size:0.9rem;">No hay productos con modelo 3D asignado.</p>';
+        return;
+    }
+    container.innerHTML = '<p style="font-weight:600;margin-bottom:10px;color:var(--primary-color);">Estado de modelos 3D</p>';
+    const lista = document.createElement('div');
+    lista.style.cssText = 'display:flex;flex-direction:column;gap:6px;';
+    modelosUnicos.forEach(nombre => {
+        const item = document.createElement('div');
+        item.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 12px;background:#f4f9f4;border-radius:8px;font-size:0.85rem;';
+        item.innerHTML = '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + nombre + '</span>'
+            + '<span class="modelo-size" style="color:#95a5a6;font-size:0.8rem;">verificando...</span>';
+        lista.appendChild(item);
+        fetch('../assets/' + nombre, { method: 'HEAD', cache: 'no-cache' })
+            .then(r => {
+                if (!r.ok) throw new Error('No encontrado');
+                const size = parseInt(r.headers.get('Content-Length') || '0');
+                const sizeMB = (size / 1024 / 1024).toFixed(1);
+                const color = size > 10 * 1024 * 1024 ? '#e74c3c' : '#27ae60';
+                item.querySelector('.modelo-size').innerHTML = '<span style="color:' + color + ';font-weight:600;">' + sizeMB + ' MB</span>';
+            })
+            .catch(() => {
+                item.querySelector('.modelo-size').innerHTML = '<span style="color:#e74c3c;">no encontrado</span>';
+            });
+    });
+    container.appendChild(lista);
+    const nota = document.createElement('p');
+    nota.style.cssText = 'margin-top:8px;font-size:0.8rem;color:#95a5a6;';
+    nota.innerHTML = 'Modelos &gt;10 MB (rojo) requieren compresión. '
+        + 'Ejecuta: <code style="background:#1a1a2e;color:#7bed9f;padding:2px 6px;border-radius:4px;">node scripts/comprimir.js assets/*.glb</code>';
+    container.appendChild(nota);
 }
 
 // Canvas leaf overlay

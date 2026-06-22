@@ -387,6 +387,7 @@
                         <small class="modelo-ayuda">
                             Selecciona un archivo .glb de tu computadora — el nombre se autocompleta.
                             Para que funcione en el catálogo, copia el archivo a la carpeta <strong>assets/</strong> del sitio.
+                            Luego comprímelo con: <code style="background:#1a1a2e;color:#7bed9f;padding:1px 5px;border-radius:3px;">node scripts/comprimir.js assets/nuevo-modelo.glb</code>
                         </small>
                         <div id="modelo-preview-container" class="oculto">
                             <model-viewer id="preview-model" alt="Vista previa 3D" camera-controls auto-rotate></model-viewer>
@@ -416,6 +417,8 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div id="modelos-estado" style="margin-top:30px;padding:16px;background:#fafcfa;border:1px solid #e2ebe2;border-radius:12px;"></div>
             </div>
         </div>
 
