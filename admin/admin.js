@@ -460,16 +460,15 @@ function tieneThumb(modelName) {
 
 document.getElementById('btnGenerarThumbs')?.addEventListener('click', function() {
     var productos = obtenerProductos();
-    var sinThumb = productos.filter(function(p) { return !tieneThumb(p.modelo); });
-    if (sinThumb.length === 0) {
-        document.getElementById('thumbProgress').textContent = '✓ Todos los productos ya tienen thumbnail.';
+    if (productos.length === 0) {
+        document.getElementById('thumbProgress').textContent = 'No hay productos registrados.';
         return;
     }
 
     var progress = document.getElementById('thumbProgress');
     var btn = this;
     btn.disabled = true;
-    progress.innerHTML = 'Generando ' + sinThumb.length + ' thumbnails... (abre la consola si el navegador bloquea múltiples descargas)';
+    progress.innerHTML = 'Regenerando ' + productos.length + ' thumbnails...';
 
     // Crear model-viewer oculto para capturar screenshots
     var viewer = document.createElement('model-viewer');
@@ -482,17 +481,17 @@ document.getElementById('btnGenerarThumbs')?.addEventListener('click', function(
     var idx = 0;
 
     function capturarSiguiente() {
-        if (idx >= sinThumb.length) {
+        if (idx >= productos.length) {
             viewer.remove();
             btn.disabled = false;
             renderizarTabla();
-            progress.innerHTML = '<span style="color:var(--success-color);font-weight:600;">✓ Thumbnails generados (' + sinThumb.length + ' productos)</span>';
+            progress.innerHTML = '<span style="color:var(--success-color);font-weight:600;">✓ Thumbnails regenerados (' + productos.length + ' productos)</span>';
             return;
         }
 
-        var p = sinThumb[idx];
+        var p = productos[idx];
         var ruta = '../assets/' + p.modelo;
-        progress.textContent = '[' + (idx + 1) + '/' + sinThumb.length + '] ' + p.nombre + '...';
+        progress.textContent = '[' + (idx + 1) + '/' + productos.length + '] ' + p.nombre + '...';
 
         function onLoad() {
             var originalBg = viewer.style.background;
