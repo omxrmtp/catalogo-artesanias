@@ -116,6 +116,18 @@ function agregarAlCarrito(producto) {
     }
     actualizarCarritoUI();
     animarBotonCarrito();
+    mostrarToast('Producto añadido al carrito');
+}
+
+function mostrarToast(texto) {
+    var el = document.getElementById('cart-toast');
+    if (!el) return;
+    el.textContent = texto;
+    el.classList.add('visible');
+    clearTimeout(el._timeout);
+    el._timeout = setTimeout(function() {
+        el.classList.remove('visible');
+    }, 2000);
 }
 
 function quitarDelCarrito(id) {
@@ -650,7 +662,7 @@ function initHojaOverlay() {
     container.appendChild(canvas);
 
     var w, h, hojas = [], corriendo = false;
-    var maxHojas = 35;
+    var maxHojas = 60;
 
     var colores = ['#3b5240','#7fa185','#5a7a5e','#4a7a4e','#6b9a6f','#8db892','#2d5a32'];
 
@@ -665,7 +677,7 @@ function initHojaOverlay() {
 
     function crearHoja() {
         if (hojas.length >= maxHojas) return;
-        var tam = 12 + Math.random() * 18;
+        var tam = 16 + Math.random() * 22;
         hojas.push({
             x: Math.random() * (w + 100) - 50,
             y: -tam - Math.random() * 40,
@@ -675,7 +687,7 @@ function initHojaOverlay() {
             rotVel: (Math.random() - 0.5) * 3,
             vaiven: (Math.random() - 0.5) * 60,
             fase: Math.random() * Math.PI * 2,
-            opacidad: 0.3 + Math.random() * 0.45,
+            opacidad: 0.5 + Math.random() * 0.4,
             color: colores[Math.floor(Math.random() * colores.length)]
         });
     }
@@ -748,7 +760,7 @@ function initHojaOverlay() {
             dibujarHoja(p);
         }
 
-        if (hojas.length < maxHojas && Math.random() < 0.3) {
+        if (hojas.length < maxHojas && Math.random() < 0.4) {
             crearHoja();
         }
 
@@ -756,13 +768,13 @@ function initHojaOverlay() {
     }
 
     // Ráfaga inicial
-    for (var i = 0; i < 20; i++) {
+    for (var i = 0; i < 30; i++) {
         (function(delay) {
             setTimeout(function() {
                 if (!corriendo) return;
-                for (var j = 0; j < 2; j++) crearHoja();
+                for (var j = 0; j < 3; j++) crearHoja();
             }, delay);
-        })(i * 120);
+        })(i * 100);
     }
 
     // Mostrar canvas con fade in

@@ -1505,3 +1505,35 @@ footer p {
         font-size: 0.72rem;
     }
 }
+
+/* === TOAST NOTIFICACIÓN === */
+.cart-toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--primary-color);
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    pointer-events: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+    white-space: nowrap;
+    font-weight: 500;
+}
+.cart-toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 480px) {
+    .cart-toast {
+        bottom: 80px;
+        padding: 10px 22px;
+        font-size: 0.82rem;
+    }
+}
