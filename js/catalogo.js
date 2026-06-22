@@ -410,18 +410,17 @@ function crearViewerEnWrapper(wrapper, modelName, mobile) {
         if (badge) badge.style.display = 'none';
 
         if (!mobile) {
-            var originalBg = viewer.style.background;
-            viewer.style.background = '#e2ebe2';
+            viewer.style.backgroundColor = '#e2ebe2';
             requestAnimationFrame(function() {
-                setTimeout(function() {
+                requestAnimationFrame(function() {
                     try {
-                        var dataUrl = viewer.toDataURL('image/jpeg', 0.7);
+                        var dataUrl = viewer.toDataURL('image/jpeg', 0.85);
                         if (dataUrl && dataUrl.length > 1000) {
                             localStorage.setItem('thumb_' + modelName, dataUrl);
                         }
                     } catch (e) {}
-                    viewer.style.background = originalBg || '';
-                }, 200);
+                    viewer.style.backgroundColor = '';
+                });
             });
         }
 

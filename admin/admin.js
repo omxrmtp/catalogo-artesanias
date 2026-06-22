@@ -494,22 +494,21 @@ document.getElementById('btnGenerarThumbs')?.addEventListener('click', function(
         progress.textContent = '[' + (idx + 1) + '/' + productos.length + '] ' + p.nombre + '...';
 
         function onLoad() {
-            var originalBg = viewer.style.background;
-            viewer.style.background = '#e2ebe2';
+            viewer.style.backgroundColor = '#e2ebe2';
             requestAnimationFrame(function() {
-                setTimeout(function() {
+                requestAnimationFrame(function() {
                     try {
-                        var dataUrl = viewer.toDataURL('image/jpeg', 0.7);
+                        var dataUrl = viewer.toDataURL('image/jpeg', 0.85);
                         if (dataUrl && dataUrl.length > 1000) {
                             localStorage.setItem('thumb_' + p.modelo, dataUrl);
                         }
                     } catch(e) {}
-                    viewer.style.background = originalBg || '';
+                    viewer.style.backgroundColor = '';
                     viewer.removeEventListener('load', onLoad);
                     viewer.removeEventListener('error', onError);
                     idx++;
                     capturarSiguiente();
-                }, 200);
+                });
             });
         }
 
